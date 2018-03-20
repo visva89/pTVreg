@@ -9,8 +9,8 @@ Medical data from volunteers used in the examples was anonimized.
 Groupwise 2D registration with nuclear metric. 
 Extreme breathing motion.
 
-<img src = "imgs/perf_register.gif", height = "300px"/>
-<img src = "imgs/perf_track.gif", height = "300px"/>
+<img src = "imgs/perf_register.gif" height = "300px"/>
+<img src = "imgs/perf_track.gif" height = "300px"/>
 
 *Figure: input images; registered images; tracking animation;*
 
@@ -21,8 +21,8 @@ Groupwise 2D registration with nuclear metric.
 Breathing motion.
 Notice contrast inversion.
 
-<img src = "imgs/molli_register.gif", height = "300px"/>
-<img src = "imgs/molli_track.gif", height = "300px"/>
+<img src = "imgs/molli_register.gif" height = "300px"/>
+<img src = "imgs/molli_track.gif" height = "300px"/>
 
 *Figure: input images; registered images; tracking animation;*
 
@@ -33,7 +33,7 @@ Groupwise 2D registration with nuclear metric.
 Breathing motion.
 Notice low SNR.
 
-<img src = "imgs/dti_register.gif", height = "300px"/>
+<img src = "imgs/dti_register.gif" height = "300px"/>
 
 *Figure: input images; registered images;*
 
@@ -49,8 +49,8 @@ Notice low SNR.
 Groupwise 2D registration with nuclear metric. 
 Cardiac motion.
 
-<img src = "imgs/heart_SA_register.gif", height = "300px"/>
-<img src = "imgs/heart_SA_track.gif", height = "300px"/>
+<img src = "imgs/heart_SA_register.gif" height = "300px"/>
+<img src = "imgs/heart_SA_track.gif" height = "300px"/>
 
 *Figure: input images; registered images; tracking animation;*
 
@@ -63,14 +63,14 @@ The method is not limited to medical images and can be applied to natural images
 Groupwise and pairwise (with SSD metric) 2D registration routines both work well.
 Multichannel (RGB) images.
 
-<img src = "imgs/rolling_shutter_register.gif", height = "300px"/>
+<img src = "imgs/rolling_shutter_register.gif" height = "300px"/>
 
 *Figure: input images; registered images;*
 
 Now we can fit rigid or affine motion to estimated displacements and use them to stabilize images. 
 We can observe "jelly" effect due to sequential CMOS sensor readout (rolling shutter) that can not be compensated for with linear motion models.
 
-<img src = "imgs/rolling_shutter_rig_affine.gif", height = "300px"/>
+<img src = "imgs/rolling_shutter_rig_affine.gif" height = "300px"/>
 
 *Figure: rigid motion; affine motion*
 
@@ -81,14 +81,14 @@ Groupwise 2D multichannel (RGB) registration of 550 facelapse images.
 Note that pairwise registration fails here (and about 10 times slower than groupwise).
 Images extracted from [Noah Kalinas Youtube Video](https://www.youtube.com/watch?v=iPPzXlMdi7o)
 
-<img src = "imgs/faces_register.gif", height = "300px"/>
-<img src = "imgs/faces_track.gif", height = "300px"/>
+<img src = "imgs/faces_register.gif" height = "300px"/>
+<img src = "imgs/faces_track.gif" height = "300px"/>
 
 *Figure: input images; registered images; tracking animation;*
 
 To suppress nonrigid registration artefacts, fitting rigid+scale or affine model can help:
 
-<img src = "imgs/faces_register_rigids_affine.gif", height = "300px"/>
+<img src = "imgs/faces_register_rigids_affine.gif" height = "300px"/>
 
 *Figure: rigid+scale motion; affine motion*
 
@@ -99,12 +99,12 @@ To suppress nonrigid registration artefacts, fitting rigid+scale or affine model
 
 Pairwise 3D registration using LCC metric. 
 
-<img src="imgs/dir_pair.png", height="300px"/>
+<img src="imgs/dir_pair.png" height="300px"/>
 
 *Figure: overlayed initial images; overlayed registered images*
 
-<img src = "imgs/DIR_pw_stab.gif", height = "200px"/>
-<img src = "imgs/DIR_pw_track.gif", height = "200px"/>
+<img src = "imgs/DIR_pw_stab.gif" height = "200px"/>
+<img src = "imgs/DIR_pw_track.gif" height = "200px"/>
 
 *Figure: registered images; tracking animation;*
 
@@ -129,8 +129,8 @@ our method achieves the best registration result in terms of TRE (0.92 mm), and 
 Pairwise 3D registration using nuclear metric. This is just an example of 3D groupwise registration.
 TRE between inhale and exhale states did not improve.
 
-<img src = "imgs/DIR_group_stab.gif", height = "200px"/>
-<img src = "imgs/DIR_group_track.gif", height = "200px"/>
+<img src = "imgs/DIR_group_stab.gif" height = "200px"/>
+<img src = "imgs/DIR_group_track.gif" height = "200px"/>
 
 *Figure: registered images; tracking animation;*
 
@@ -139,7 +139,7 @@ TRE between inhale and exhale states did not improve.
 
 Pairwise 3D registration using LCC metric with displacement grid refinement.
 
-<img src="imgs/copd_pair.png", height="300px"/>
+<img src="imgs/copd_pair.png" height="300px"/>
 
 *Figure: overlayed initial images; overlayed registered images*
 
@@ -165,7 +165,7 @@ Pairwise 3D registration using LCC metric.
 Note that this dataset contains landmarks both inside and outside the liver.
 Thus we can evaluate registration accuracy on the both sides of the sliding interface.
 
-<img src="imgs/liver_pair.png", height="300px"/>
+<img src="imgs/liver_pair.png" height="300px"/>
 
 *Figure: overlayed initial images; overlayed registered images*
 
@@ -187,7 +187,7 @@ Here fixed image is accompanied with the segmentation of aorta.
 The aim is to acquire segmentation of the moving image.
 We simultaneously (1) register both images and (2) align fixed segmentation with the moving image, using Gaussian intensity models of foreground and background pixels.
 
-<img src="imgs/aorta_segm.png", height="900px"/>
+<img src="imgs/aorta_segm.png" height="900px"/>
 
 *Figure: fixed, moving and registered images with overlayed propagated and manual segmentations of aorta.*
 
