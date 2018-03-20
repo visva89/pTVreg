@@ -40,27 +40,27 @@ using [LBFGS](https://www.cs.ubc.ca/~schmidtm/Software/minFunc.html).
 
 ### A Few Registration Examples
 
-<img src = "imgs/perf_register.gif", height = "200px"/>
-<img src = "imgs/perf_track.gif", height = "200px"/>
+<img src = "imgs/perf_register.gif" height = "200px"/>
+<img src = "imgs/perf_track.gif" height = "200px"/>
 
 *Figure: input images; registered images; tracking animation;*
 
-<img src = "imgs/heart_SA_register.gif", height = "200px"/>
-<img src = "imgs/heart_SA_track.gif", height = "200px"/>
+<img src = "imgs/heart_SA_register.gif" height = "200px"/>
+<img src = "imgs/heart_SA_track.gif" height = "200px"/>
 
 *Figure: input images; registered images; tracking animation;*
 
-<img src = "imgs/faces_register.gif", height = "200px"/>
-<img src = "imgs/faces_track.gif", height = "200px"/>
+<img src = "imgs/faces_register.gif" height = "200px"/>
+<img src = "imgs/faces_track.gif" height = "200px"/>
 
 *Figure: input images; registered images; tracking animation;*
 
-<img src="imgs/copd_pair.png", height="200px"/>
+<img src="imgs/copd_pair.png" height="200px"/>
 
 *Figure: overlayed initial images; overlayed registered images;*
 
-<img src = "imgs/DIR_group_stab.gif", height = "200px"/>
-<img src = "imgs/DIR_group_track.gif", height = "200px"/>
+<img src = "imgs/DIR_group_stab.gif" height = "200px"/>
+<img src = "imgs/DIR_group_track.gif" height = "200px"/>
 
 *Figure: registered images; tracking animation;*
 
