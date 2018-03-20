@@ -1,0 +1,3 @@
+function dice = dice_coef(gt1, gt2)
+dice = 2 * nnz((gt1 > 0.5) & (gt2 > 0.5)) / ...
+                        (nnz(gt1 > 0.5) + nnz(gt2 > 0.5));
