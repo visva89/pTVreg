@@ -9,7 +9,7 @@ We report the following accuracy of pTV on 4DCT and COPDgene datasets:
 
 | COPD 1  | COPD 2  | COPD 3  | COPD 4  | COPD 5  | COPD 6  | COPD 7  | COPD 8  | COPD 9  | COPD 10  |**Mean TRE**|Mean Time (sec.)|
 |---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|----------|---------|
-|0.71|1.91|0.77|0.67|0.71|0.66|0.75|0.78|0.64|0.85|**0.8461**|442|
+|0.71 (0.81)|1.89 (3.63)|0.77 (0.77)|0.68 (0.74)|0.71 (0.83)|0.66 (1.15)|0.75 (0.87)|0.78 (1.61)|0.63 (1.01)|0.85 (0.86)|**0.8436 (1.2285)**|442|
 
 *Table: TRE is computed in the snap-to-voxel fashion. The code for this experiment is provided in* `examples_ptv/COPD_finetune.m`
 
