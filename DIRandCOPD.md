@@ -11,7 +11,7 @@ We report the following accuracy of pTV on 4DCT and COPDgene datasets:
 |---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|----------|---------|
 |0.71 (0.81)|1.89 (3.63)|0.77 (0.77)|0.68 (0.74)|0.71 (0.83)|0.66 (1.15)|0.75 (0.87)|0.78 (1.61)|0.63 (1.01)|0.85 (0.86)|**0.8436 (1.2285)**|442|
 
-*Table: TRE is computed in the snap-to-voxel fashion. The code for this experiment is provided in* `examples_ptv/COPD_finetune.m`
+*Table: TRE (in mm) is computed in the snap-to-voxel fashion, standard deviation is given in parentheses. The code for this experiment is provided in* `examples_ptv/COPD_finetune.m`
 
 For 4DCT dataset the method is configured as follows:
 * images are resampled to 1x1x1 mm^3 resolution
