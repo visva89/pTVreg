@@ -1173,8 +1173,10 @@ for i = 1:maxIter
         f = f_new;
         g = g_new;
     end
-%         fprintf('Step len  max: %e, median: %e\n', max(abs(t*d)), median(abs(t*d)));
-
+    
+%     if method == LBFGS
+%     fprintf('Step len  max: %e, median: %e Max grad: %e\n', max(abs(t*d)), median(abs(t*d)), max(abs(g)));
+%     end
 	% Compute Optimality Condition
 	optCond = max(abs(g));
 	

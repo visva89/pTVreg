@@ -1,17 +1,15 @@
 We report the following accuracy of pTV on 4DCT and COPDgene datasets:
 
-| 4DCT 1  | 4DCT 2  | 4DCT 3  | 4DCT 4  | 4DCT 5  | 4DCT 6  | 4DCT 7  | 4DCT 8  | 4DCT 9  | 4DCT 10  |**Mean**|Mean Time (sec.)|
+| 4DCT 1  | 4DCT 2  | 4DCT 3  | 4DCT 4  | 4DCT 5  | 4DCT 6  | 4DCT 7  | 4DCT 8  | 4DCT 9  | 4DCT 10  |**Mean TRE**|Mean Time (sec.)|
 |---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|----------|---------|
-|0.77 (0.89)|0.75 (0.90)|0.93 (1.07)|1.26 (1.27)|1.07 (1.42)|0.83 (0.92)|0.80 (0.91)|1.01 (1.29)|0.91 (0.95)|0.84 (0.97)|**0.92 (1.06)**|130|
-
-*Table: TRE (in mm) is computed in the snap-to-voxel fashion, standard deviation is given in parentheses. The code for this experiment is provided in* `examples_ptv/DIR_test_all.m`
+|0.77|0.75|0.93|1.26|1.07|0.83|0.80|1.01|0.91|0.84|**0.92**|130|
+*Table: TRE is computed in the snap-to-voxel fashion. The code for this experiment is provided in* `examples_ptv/DIR_test_all.m`
 
 
 | COPD 1  | COPD 2  | COPD 3  | COPD 4  | COPD 5  | COPD 6  | COPD 7  | COPD 8  | COPD 9  | COPD 10  |**Mean TRE**|Mean Time (sec.)|
 |---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|----------|---------|
-|0.71 (0.81)|1.89 (3.63)|0.77 (0.77)|0.68 (0.74)|0.71 (0.83)|0.66 (1.15)|0.75 (0.87)|0.78 (1.61)|0.63 (1.01)|0.85 (0.86)|**0.8436 (1.2285)**|442|
-
-*Table: TRE (in mm) is computed in the snap-to-voxel fashion, standard deviation is given in parentheses. The code for this experiment is provided in* `examples_ptv/COPD_finetune.m`
+|0.71|1.91|0.77|0.67|0.71|0.66|0.75|0.78|0.64|0.85|**0.8461**|442|
+*Table: TRE is computed in the snap-to-voxel fashion. The code for this experiment is provided in* `examples_ptv/COPD_finetune.m`
 
 For 4DCT dataset the method is configured as follows:
 * images are resampled to 1x1x1 mm^3 resolution

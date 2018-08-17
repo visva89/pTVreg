@@ -92,6 +92,20 @@ function varargout = metric_loc_cc_fftn(vol_fix, voldef, dvol, cache)
     lcc = mycrop(lcc);
     g = mycrop(g);
     
+    loc_cc_abs = false;
+
+    if isfield(cache, 'loc_cc_abs')
+        loc_cc_abs = cache.loc_cc_abs;
+    end
+    if loc_cc_abs
+%         tmp_sgn = sign(lcc);
+        deps = 1e-2;
+        tmp_sgn = lcc ./ sqrt(lcc.^2 + deps);
+%         lcc = abs(lcc);
+        lcc = sqrt(lcc.^2 + deps);
+        g = g .* tmp_sgn;
+    end
+    
     lcc = (1-lcc) * dvol;
     g = -g * dvol;
 

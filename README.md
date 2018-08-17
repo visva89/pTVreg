@@ -8,6 +8,10 @@ It provides the following functionality:
 * approximate 2D registration run time: 5 sec (8 images), 40 sec (60 images) on a 6 core CPU
 * approximate 3D registration run time: 90 sec pair of 226x226x106 volumes on a 6 core CPU
 * Matlab implementation, compiled MEX files for Linux, Windows, and OSX (no multithreading)
+* [Please see the complete set of **examples** here](Examples.md)
+* [**Documentation** is available here](documentation.md)
+* [**Troubleshooting** guide](troubleshooting.md)
+* For more details please refer to ["Vishnevskiy V, Gass T, Szekely G, Tanner C, Goksel O. Isotropic total variation regularization of displacements in parametric image registration. IEEE TMI. 2017."](http://ieeexplore.ieee.org/abstract/document/7570266/)
 
 
 Implemented image dissimilarity metrics:
@@ -32,35 +36,29 @@ $`\min_{k} D(J,\;  I\circ T(k) ) + \lambda \text{TV}(k)`$,
 
 using [LBFGS](https://www.cs.ubc.ca/~schmidtm/Software/minFunc.html). 
 
-
-* Please see the complete set of [examples here](Examples.md)
-* Documentation is available [here](documentation.md)
-* For more details please refer to ["Vishnevskiy V, Gass T, Szekely G, Tanner C, Goksel O. Isotropic total variation regularization of displacements in parametric image registration. IEEE TMI. 2017."](http://ieeexplore.ieee.org/abstract/document/7570266/)
-
-
 ### A Few Registration Examples
 
-<img src = "imgs/perf_register.gif" height = "200px"/>
-<img src = "imgs/perf_track.gif" height = "200px"/>
+<img src = "imgs/perf_register.gif", height = "200px"/>
+<img src = "imgs/perf_track.gif", height = "200px"/>
 
 *Figure: input images; registered images; tracking animation;*
 
-<img src = "imgs/heart_SA_register.gif" height = "200px"/>
-<img src = "imgs/heart_SA_track.gif" height = "200px"/>
+<img src = "imgs/heart_SA_register.gif", height = "200px"/>
+<img src = "imgs/heart_SA_track.gif", height = "200px"/>
 
 *Figure: input images; registered images; tracking animation;*
 
-<img src = "imgs/faces_register.gif" height = "200px"/>
-<img src = "imgs/faces_track.gif" height = "200px"/>
+<img src = "imgs/faces_register.gif", height = "200px"/>
+<img src = "imgs/faces_track.gif", height = "200px"/>
 
 *Figure: input images; registered images; tracking animation;*
 
-<img src="imgs/copd_pair.png" height="200px"/>
+<img src="imgs/copd_pair.png", height="200px"/>
 
 *Figure: overlayed initial images; overlayed registered images;*
 
-<img src = "imgs/DIR_group_stab.gif" height = "200px"/>
-<img src = "imgs/DIR_group_track.gif" height = "200px"/>
+<img src = "imgs/DIR_group_stab.gif", height = "200px"/>
+<img src = "imgs/DIR_group_track.gif", height = "200px"/>
 
 *Figure: registered images; tracking animation;*
 
@@ -97,7 +95,7 @@ If you decide to use our registration toolbox please consider referring to this 
 }
 ```
 
-The code is developed by Dr. Valery Vishnevskiy, [Cardiac Magnetic Resonance group](http://www.cmr.ethz.ch/), Institute for Biomedical Engineering, ETH Zurich, University of Zurich,
+The code is developed by Dr. Valery Vishnevskiy `valera.vishnevskiy@yandex.ru`, [Cardiac Magnetic Resonance group](http://www.cmr.ethz.ch/), Institute for Biomedical Engineering, ETH Zurich, University of Zurich,
 [Computer-assisted Applications in Medicine](https://www.caim.ee.ethz.ch/), Computer Vision Laboratory, ETH Zurich.
 
 ![ETHZurich](imgs/ethzurich_logo.png)

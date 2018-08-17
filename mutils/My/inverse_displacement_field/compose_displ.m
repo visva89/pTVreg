@@ -1,5 +1,6 @@
 function Tcomp = compose_displ(T1, T2, varargin) %, interp_type, out_type, out_val, pix_resolution)
-% compose_displ(T1, T2, interp_type, out    
+% compose_displ(T1, T2, interp_type, out   
+% equiv im_0 = imdeform2(im, compose_displ(squeeze(T1), squeeze(T2), 1), 1);
     interp_type = 0;
     out_type = 0;
     out_val = 0;

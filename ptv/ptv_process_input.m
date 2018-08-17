@@ -1,10 +1,12 @@
 function [imsz, Nd, Nch, Nimgs, nlvl, cp_refinements, interp_type, metric, ...
     scale_metric_param, pix_resolution, metric_param, grid_spacing, ...
     max_iters, opt_method, display, isoTV, D1L2, D2L2, D2L1, D1L1, D1Lp, spat_reg_p_val, ...
+    D2Lp, spat_reg_p_val2, ...
     T_D1L2, T_D2L2, T_D2L1, T_D1L1, border_mask, fixed_mask, moving_mask, csqrt, ...
     fold_k, k_down, fine_pyramid, mean_penalty, loc_cc_approximate, nuclear_coef, ...
     singular_coefs, nuclear_resc_strategy, mov_segm, segm_val1, segm_val0, segm_koef, ...
-    K_ord, check_gradients, regul_displs_directly, ngf_eta, jac_reg, img_edge_prior_strength] ...
+    K_ord, check_gradients, regul_displs_directly, ngf_eta, jac_reg, img_edge_prior_strength, local_nuclear_patch_size,...
+    loc_cc_abs, nuclear_centering] ...
     = ptv_process_input(volmov, volfix, opts)
 
 try
@@ -30,7 +32,7 @@ if ndims(volfix) > 4
 end
 
 if max(abs(volmov) > 5)
-    warning('Image intensities seem to be unscaled');
+    warning('Image intensities seem to be unnormalized');
 end
 
 nlvl = getoptions(opts, 'nlvl', []);
@@ -65,6 +67,13 @@ max_iters = getoptions(opts, 'max_iters', 100);
 opt_method = getoptions(opts, 'opt_method', 'lbfgs');
 display = getoptions(opts, 'display', 'off');
 
+local_nuclear_patch_size = getoptions(opts, 'local_nuclear_patch_size', 10);
+if numel(local_nuclear_patch_size) == 1
+    local_nuclear_patch_size = ones(1, Nd) * local_nuclear_patch_size;
+else
+    local_nuclear_patch_size = local_nuclear_patch_size(1:Nd);
+end
+
 isoTV = getoptions(opts, 'isoTV', 0.0);
 D1L2 = getoptions(opts, 'D1L2', 0);
 D2L2 = getoptions(opts, 'D2L2', 0);
@@ -72,6 +81,9 @@ D2L1 = getoptions(opts, 'D2L1', 0);
 D1L1 = getoptions(opts, 'D1L1', 0);
 D1Lp = getoptions(opts, 'D1Lp', 0);
 spat_reg_p_val = getoptions(opts, 'spat_reg_p_val', 0.7);
+
+D2Lp = getoptions(opts, 'D2Lp', 0);
+spat_reg_p_val2 = getoptions(opts, 'spat_reg_p_val2', 0.7);
 
 img_edge_prior_strength = getoptions(opts, 'img_edge_prior_strength', 0);
 
@@ -95,6 +107,9 @@ if mean_penalty > 0 && ~isempty(volfix)
 end
 
 loc_cc_approximate = getoptions(opts, 'loc_cc_approximate', false);
+
+nuclear_centering = getoptions(opts, 'nuclear_centering', 0);
+loc_cc_abs = getoptions(opts, 'loc_cc_abs', false);
 
 nuclear_coef = getoptions(opts, 'nuclear_coef', 1);
 singular_coefs = getoptions(opts, 'singular_coefs', []);
@@ -132,7 +147,10 @@ regul_displs_directly = getoptions(opts, 'regularize_directly', false);
 
 if isempty(nlvl) 
 %     nlvl = floor(abs(log(min(imsz(1:Nd)) / 4)) / abs(log(k_down)));
-    nlvl = floor(abs(log(min(imsz(1:Nd)) / max(4, max(grid_spacing)) )) / abs(log(k_down)));
+%     nlvl = floor(abs(log(min(imsz(1:Nd)) / max(4, max(grid_spacing)) )) / abs(log(k_down)));
+%     imsz
+%     grid_spacing
+    nlvl = min(  floor(abs(log(  imsz(1:Nd) ./ max(4, grid_spacing(1:Nd)) )) / abs(log(k_down))));
 end
 if ~isempty(border_mask) && border_mask > 0
     bmask = ones(imsz);
@@ -209,6 +227,11 @@ function check_names(opts)
         'jac_reg', ...
         'ngf_eta', ...
         'img_edge_prior_strength', ...
+        'D2Lp', ...
+        'spat_reg_p_val2', ...
+        'local_nuclear_patch_size',...
+        'loc_cc_abs',...
+        'nuclear_centering'...
         };
     unrec = setdiff(fieldnames(opts), known_inputs);
     if ~isempty(unrec)

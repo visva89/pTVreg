@@ -24,7 +24,7 @@ if  m <= n
     if nargout > 2
         V = X'*U;
         s = sqrt(d);
-        V = V ./ s';
+        V = V ./ (s'+eps);
 %         V = bsxfun(@(x,c)x./c, V, s');
         S = diag(s);
     end
@@ -40,12 +40,20 @@ else
     %s = sqrt(sum(U.^2,1))';
     s = sqrt(d);
 
-    U = U ./ s';
+    U = U ./ (s'+eps);
 %     U = bsxfun(@(x,c)x./c, U, s');
    
     S = diag(s);
 end
 
 % if any(fl(isnan(U))) || any(fl(isnan(S))) || any(fl(isnan(V)))
-%     [U, S, V] = svd(X, 'econ');
+%     warning('Nan in svd');
+%     
+%     fprintf('Nan in svd ########################\n');
+%     std(X(:))
+%     mean(X(:))
+%     X
+%     imagesc(X); colorbar; pause;
+% S
+% [U, S, V] = svd(X, 'econ');
 % end

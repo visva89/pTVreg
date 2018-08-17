@@ -4,7 +4,7 @@
 
   `volmov`: image or array of movinv images that will be registered
   
-  `volmov`: empty set or single reference image / target onto which moving
+  `volfix`: empty set or single reference image / target onto which moving
           images are registered. Can be [] only in groupwise registration
           with nuclear metric
           
@@ -81,14 +81,35 @@ optimized
 
 * 'nuclear': nuclear (PCA) groupwise metric
 
+* 'local_nuclear'
+
 * 'ngf' : normalied gradients field
 
 *DEFAULT*: 'ssd'
 
-`metric_param`: used for 'loc_cc_fftn*' metrics, is the sigma of Gaussian
-weighting kernel (in physical units). Array of size Nd
+`local_nuclear_patch_size`: ...
 
-*DEFAULT*: 7, but you should in practice use smaller value
+*DEFAULT*: 10
+
+`nuclear_centering type`: for 'nuclear' and 'local_nuclear' metric choose
+patch centering type (options 0, 3 are the most reasonable):
+
+* '0': no centering
+
+* '1': average over dimensions 1,2,3 (spatial)
+
+* '2': average over all dimensions 1,2,3,4,5
+
+* '3': average over samples, dimensions 4,5 
+
+* '4': 1 then 2
+
+*DEFAULT*: 0
+
+`metric_param`: used for 'loc_cc_fftn*' metrics, is the sigma of Gaussian
+weighting kernel (in physical units). For local_nuclear is the spatial size of nonoverlapping. patch Array of size Nd
+
+*DEFAULT*: 7, but you should in practice use smaller value 
 
 `ngf_eta` : NGF safeguard
 
@@ -100,6 +121,11 @@ weighting kernel (in physical units). Array of size Nd
 
 `loc_cc_approximate`: flag if we should use fast (approximate) formula for
 the gradient of 'loc_cc_fftn*' metric. Use only for huge images.
+
+*DEFAULT*: false
+
+`loc_cc_abs`: flag if we should use abs value of correlation coefficient in 'loc_cc_fftn*' metrics.
+Works well for contrast inversions
 
 *DEFAULT*: false
 
@@ -179,6 +205,8 @@ to evaluate image dissimilarity metric.
 *DEFAULT*: 0
 
 `D1Lp`: nonconvex prior with value p = opts.spat_reg_p_val
+
+`D2Lp`: nonconvex prior with value p = opts.spat_reg_p_val2
 
 `check_gradients`: {false, true, #} numerically check # of derivatives
 

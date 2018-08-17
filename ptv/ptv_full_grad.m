@@ -4,11 +4,13 @@ function [err, grad, fData, fReg] = ptv_full_grad(volmov, volfix, Knots, Knots_s
             regul_displs_directly, csqrt,...
             A1, A2, mean_penalty, ...
             T_D1L1, T_D1L2, T_D2L1, T_D2L2, DT1, DT2, D1Lp, spat_reg_p_val,...
+            D2Lp, spat_reg_p_val2, ...
             grid_spacing, pix_resolution, interp_type, metric, ...
             nuclear_coef, singular_coefs, ...
             cur_fixed_mask, cur_moving_mask, cache,  ...
             internal_dtype, fold_k, K_ord, KT,...
-            mov_segm, segm_val1, segm_val0, segm_koef, Nd, jac_reg, edge_prior)
+            mov_segm, segm_val1, segm_val0, segm_koef, Nd, jac_reg, ...
+            edge_prior, local_nuclear_patch_size, nuclear_centering)
     out_type = 0;
     out_val = 0;
     Knots = reshape(Knots, Knots_size);
@@ -47,7 +49,31 @@ function [err, grad, fData, fReg] = ptv_full_grad(volmov, volfix, Knots, Knots_s
             if ~isempty(volfix)
                 volfixtmp = squeeze(volfix(:,:,:, ic, :));
             end
-            [err_N, nuc_G] = ptv_nuclear_metric(volfixtmp, voldef(:,:,:, ic, :), pix_resolution, cur_fixed_mask, singular_coefs);
+            [err_N, nuc_G] = ptv_nuclear_metric(volfixtmp, voldef(:,:,:, ic, :), ...
+                pix_resolution, cur_fixed_mask, singular_coefs, nuclear_centering);
+            fData = fData + nuclear_coef * err_N / Nch;
+            gNuclear(:,:,:, ic, :) = reshape(nuc_G, [volsz, 1, Nimgs]);
+        end
+        gG = sum(gNuclear .* vol_grads, 4) * (nuclear_coef / Nch);
+    elseif strcmp(metric, 'local_nuclear')
+        if Nimgs <= 1
+            error('Groupwize registration is possible only if size(volmov, 5) >= 2');
+        end
+        gNuclear = zeros([volsz, Nch, Nimgs], 'like', voldef);
+        for ic = 1 : Nch
+            volfixtmp = [];
+            if ~isempty(volfix)
+                volfixtmp = squeeze(volfix(:,:,:, ic, :));
+            end
+            
+%             subplot(121)
+%             imagesc(voldef(:,:, round(end/2), 1, 1));
+%                 subplot(122);
+%                 imagesc( sum(Knots_pix(:,:, round(end/2), :, 1), 4)); colorbar;
+%                 pause(0.02);
+            nuclear_coef = 1;
+            [err_N, nuc_G] = ptv_local_nuclear_metric(volfixtmp, voldef(:,:,:, ic, :), ...
+                pix_resolution, cur_fixed_mask, singular_coefs, local_nuclear_patch_size, nuclear_centering);
             fData = fData + nuclear_coef * err_N / Nch;
             gNuclear(:,:,:, ic, :) = reshape(nuc_G, [volsz, 1, Nimgs]);
         end
@@ -85,7 +111,6 @@ function [err, grad, fData, fReg] = ptv_full_grad(volmov, volfix, Knots, Knots_s
 %     imagesc(voldef(:,:, 1));
 %     Knots_pix(:)
 %     pause;
-    
     err = fData;
     clear vol_grads
 
@@ -160,6 +185,12 @@ function [err, grad, fData, fReg] = ptv_full_grad(volmov, volfix, Knots, Knots_s
         fReg = fReg + f_D1Lp * (D1Lp / Nimgs);
         grad = grad + g_D1Lp * (D1Lp / Nimgs);
         clear g_D1Lp
+    end
+    if D2Lp > 0
+        [f_D2Lp, g_D2Lp] = iso_spatial_D2Lp_regularization(Knots, pix_resolution .* grid_spacing, Nd, spat_reg_p_val, csqrt, edge_prior);
+        fReg = fReg + f_D2Lp * (D2Lp / Nimgs);
+        grad = grad + g_D2Lp * (D2Lp / Nimgs);
+        clear g_D2Lp
     end
     if T_D1L1 > 0 
         [f_tD1L1, g_tD1L1] = temporal_DLp_regularization(Knots, pix_resolution .* grid_spacing, DT1, 1, csqrt);
@@ -237,7 +268,7 @@ function [err, grad, fData, fReg] = ptv_full_grad(volmov, volfix, Knots, Knots_s
 %         err = err + numel(volmov)/1000 * sum(fl(Knots(4, :,:,:,:)).^ 2)/2;
 %         grad(4,:,:,:,:) = grad(4,:,:,:,:) + numel(volmov)/1000 * Knots(4,:,:,:,:);
 %     end
-    
+%     fprintf('Fdata=%e   Freg=%e\n', fData, fReg);
     if K_ord == -2 || K_ord == -3 || K_ord == -4
         grad = grad .* weights;
     end

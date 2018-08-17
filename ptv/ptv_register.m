@@ -5,7 +5,7 @@ function [voldef, Tmin_out, Kmin_out, varargout] = ptv_register(volmov, volfix, 
 % 
 %   `volmov`: image or array of movinv images that will be registered
 %   
-%   `volmov`: empty set or single reference image / target onto which moving
+%   `volfix`: empty set or single reference image / target onto which moving
 %           images are registered. Can be [] only in groupwise registration
 %           with nuclear metric
 %           
@@ -82,14 +82,35 @@ function [voldef, Tmin_out, Kmin_out, varargout] = ptv_register(volmov, volfix, 
 % 
 % * 'nuclear': nuclear (PCA) groupwise metric
 % 
+% * 'local_nuclear'
+% 
 % * 'ngf' : normalied gradients field
 % 
 % *DEFAULT*: 'ssd'
 % 
-% `metric_param`: used for 'loc_cc_fftn*' metrics, is the sigma of Gaussian
-% weighting kernel (in physical units). Array of size Nd
+% `local_nuclear_patch_size`: ...
 % 
-% *DEFAULT*: 7, but you should in practice use smaller value
+% *DEFAULT*: 10
+% 
+% `nuclear_centering type`: for 'nuclear' and 'local_nuclear' metric choose
+% patch centering type (options 0, 3 are the most reasonable):
+% 
+% * '0': no centering
+% 
+% * '1': average over dimensions 1,2,3 (spatial)
+% 
+% * '2': average over all dimensions 1,2,3,4,5
+% 
+% * '3': average over samples, dimensions 4,5 
+% 
+% * '4': 1 then 2
+% 
+% *DEFAULT*: 0
+% 
+% `metric_param`: used for 'loc_cc_fftn*' metrics, is the sigma of Gaussian
+% weighting kernel (in physical units). For local_nuclear is the spatial size of nonoverlapping. patch Array of size Nd
+% 
+% *DEFAULT*: 7, but you should in practice use smaller value 
 % 
 % `ngf_eta` : NGF safeguard
 % 
@@ -101,6 +122,11 @@ function [voldef, Tmin_out, Kmin_out, varargout] = ptv_register(volmov, volfix, 
 % 
 % `loc_cc_approximate`: flag if we should use fast (approximate) formula for
 % the gradient of 'loc_cc_fftn*' metric. Use only for huge images.
+% 
+% *DEFAULT*: false
+% 
+% `loc_cc_abs`: flag if we should use abs value of correlation coefficient in 'loc_cc_fftn*' metrics.
+% Works well for contrast inversions
 % 
 % *DEFAULT*: false
 % 
@@ -181,6 +207,8 @@ function [voldef, Tmin_out, Kmin_out, varargout] = ptv_register(volmov, volfix, 
 % 
 % `D1Lp`: nonconvex prior with value p = opts.spat_reg_p_val
 % 
+% `D2Lp`: nonconvex prior with value p = opts.spat_reg_p_val2
+% 
 % `check_gradients`: {false, true, #} numerically check # of derivatives
 % 
 % `regularize_directly`: bool
@@ -233,10 +261,12 @@ end
 [imsz, Nd, Nch, Nimgs, nlvl, cp_refinements, interp_type, metric, ...
     scale_metric_param, pix_resolution, metric_param, grid_spacing, ...
     max_iters, opt_method, display, isoTV, D1L2, D2L2, D2L1, D1L1, D1Lp, spat_reg_p_val, ...
+    D2Lp, spat_reg_p_val2, ...
     T_D1L2, T_D2L2, T_D2L1, T_D1L1, border_mask, fixed_mask, moving_mask, csqrt, ...
     fold_k, k_down, fine_pyramid, mean_penalty, loc_cc_approximate, nuclear_coef, ...
     singular_coefs, nuclear_resc_strategy, mov_segm, segm_val1, segm_val0, segm_koef, ...
-    K_ord, check_gradients, regul_displs_directly, ngf_eta, jac_reg, img_edge_prior_strength] ...
+    K_ord, check_gradients, regul_displs_directly, ngf_eta, jac_reg, img_edge_prior_strength, local_nuclear_patch_size, ...
+    loc_cc_abs, nuclear_centering] ...
     = ptv_process_input(volmov, volfix, opts);
 
 internal_dtype = 'CPU_double';
@@ -323,11 +353,12 @@ for i = 1 : nlvl + cp_refinements
     end
 
     [Tmin, Kmin, fmin, fData, fReg, outp] = int_register(volmov, volfix, cur_fixed_mask, cur_moving_mask, isoTV, D1L1, D1L2, D2L1, D2L2, Knots, ...
-                        T_D1L1, T_D1L2, T_D2L1, T_D2L2, D1Lp, spat_reg_p_val, ...
+                        T_D1L1, T_D1L2, T_D2L1, T_D2L2, D1Lp, spat_reg_p_val, D2Lp, spat_reg_p_val2, ...
                         cur_grid_spacing, cur_pix_resolution, interp_type, metric, loc_cc_approximate, cur_max_iters, metric_param_pix, display, opt_method, ...
                         nuclear_coef_cur, singular_coefs, ...
                         internal_dtype, fold_k, K_ord, cur_mov_segm, segm_val1, segm_val0, segm_koef, csqrt, check_gradients, ...
-                        regul_displs_directly, Nd, mean_penalty, ngf_eta, jac_reg, img_edge_prior_strength);
+                        regul_displs_directly, Nd, mean_penalty, ngf_eta, jac_reg, img_edge_prior_strength, local_nuclear_patch_size, ...
+                        loc_cc_abs, nuclear_centering);
     fprintf('fmin = %e (%d)\n', fmin, nlvl+1-i);
     
     Tmin = convert_to_dtype(Tmin, internal_dtype);
@@ -384,8 +415,9 @@ function n_coefs = calculate_nuclear_coefficients(gp_volfix, gp_volmov, singular
             end
             np(i) = numel(gp_volmov{i});
         end
-        nv = nv / nv(1);
-        n_coefs = 1 ./ nv;
+        nv = nv / (nv(1) + 1e-6);
+        n_coefs = 1 ./ (nv + 1e-6);
+%         nv
 
         if true
     %         n_coefs
@@ -395,8 +427,8 @@ function n_coefs = calculate_nuclear_coefficients(gp_volfix, gp_volmov, singular
     %         plot(np, nv, 'rx-'); 
     %         hold on;
     %         plot(np, n_coefs_l, 'bx-'); 
-
-            n_coefs = 1./n_coefs_l;
+            
+            n_coefs = 1./(abs(n_coefs_l) + 1e-6);
             n_coefs = n_coefs / n_coefs(1);
     %         pause;
         end
@@ -406,15 +438,15 @@ function n_coefs = calculate_nuclear_coefficients(gp_volfix, gp_volmov, singular
             n_coefs(i) = sqrt(numel(gp_volmov{1}) / numel(gp_volmov{i}) );
         end
     end
-   
 end
 
 function [Tmin, Kmin, fmin, fData, fReg, outp] = int_register(volmov, volfix, cur_fixed_mask, cur_moving_mask, isoTV, D1L1, D1L2, D2L1, D2L2, Knots0, ...
-                        T_D1L1, T_D1L2, T_D2L1, T_D2L2, D1Lp, spat_reg_p_val, ...
+                        T_D1L1, T_D1L2, T_D2L1, T_D2L2, D1Lp, spat_reg_p_val, D2Lp, spat_reg_p_val2, ......
                         cur_grid_spacing, cur_pix_resolution, interp_type, metric, loc_cc_approximate, max_iters, metric_param, display, opt_method, ...
                         nuclear_coef, singular_coefs, ...
                         internal_dtype, fold_k, K_ord, cur_mov_segm, segm_val1, segm_val0, segm_koef, csqrt, check_gradients, ...
-                        regul_displs_directly, Nd, mean_penalty, ngf_eta, jac_reg, img_edge_prior_strength)
+                        regul_displs_directly, Nd, mean_penalty, ngf_eta, jac_reg, img_edge_prior_strength, local_nuclear_patch_size, ...
+                        loc_cc_abs, nuclear_centering)
     ksz = [size(Knots0, 1), size(Knots0, 2), size(Knots0, 3)];
     [imsz, ~, Nch, Nimgs] = ptv_get_sizes_from_volsz(size(volmov));
     A1 = [];
@@ -449,7 +481,10 @@ function [Tmin, Kmin, fmin, fData, fReg, outp] = int_register(volmov, volfix, cu
     if strcmp(metric, 'loc_cc_fftn_gpu') || strcmp(metric, 'loc_cc_fftn_gpu_single') || strcmp(metric, 'loc_cc_fftn') || strcmp(metric, 'loc_cc_fftn_single')
         cache = cell(Nch, 1);
         for ic = 1 : Nch
-            cache{ic} = create_loc_cc_fftn_cache(metric, metric_param, volmov(:,:,:, ic, 1), volfix(:,:,:, ic, 1), internal_dtype, cur_fixed_mask, 1e-4, loc_cc_approximate);
+            cache{ic} = create_loc_cc_fftn_cache(metric, metric_param, ...
+                volmov(:,:,:, ic, 1), volfix(:,:,:, ic, 1), ...
+                internal_dtype, cur_fixed_mask, 1e-4, loc_cc_approximate);
+            cache{ic}.loc_cc_abs = loc_cc_abs;
         end
     end
     if strcmp(metric, 'ngf')
@@ -487,11 +522,13 @@ function [Tmin, Kmin, fmin, fData, fReg, outp] = int_register(volmov, volfix, cu
         regul_displs_directly, csqrt, ...
         A1, A2, mean_penalty,...
         T_D1L1, T_D1L2, T_D2L1, T_D2L2, DT1, DT2, D1Lp, spat_reg_p_val,...
+        D2Lp, spat_reg_p_val2, ...
         cur_grid_spacing, cur_pix_resolution, interp_type, metric, ...
         nuclear_coef, singular_coefs, ...
         cur_fixed_mask, cur_moving_mask, cache,  ...
         internal_dtype, fold_k, K_ord, KT,...
-        cur_mov_segm, segm_val1, segm_val0, segm_koef, Nd, jac_reg, edge_prior);
+        cur_mov_segm, segm_val1, segm_val0, segm_koef, Nd, jac_reg, ...
+        edge_prior, local_nuclear_patch_size, nuclear_centering);
     
     options = [];
     options.display = display;
@@ -550,7 +587,7 @@ function [Tmin, Kmin, fmin, fData, fReg, outp] = int_register(volmov, volfix, cu
         subplot(121)
         hold off
         plot(gnn(idxs), gmy(idxs), 'rx');
-        norm(gnn(idxs) - gmy(idxs))
+        fprintf('AbsNorm %e,  RelNorm %e\n', norm(gnn(idxs) - gmy(idxs)), norm(gnn(idxs) - gmy(idxs)) / norm(gnn(idxs)));
         hold on;
         plot([min(gnn(:)), max(gnn(:))], [min(gnn(:)), max(gnn(:))],'y--', 'LineWidth', 2)
         subplot(122)

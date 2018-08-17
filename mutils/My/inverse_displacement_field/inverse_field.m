@@ -19,8 +19,9 @@ function [iT] =  inverse_field(T)
 %         F = scatteredInterpolant(fl(T(:,:,1) + n1), fl(T(:,:,2) + n2), fl(n2), 'natural', 'nearest');
 %         fB2 = F(n1, n2) - n2;
 %         iT = cat(3, fB1, fB2);    
-    elseif ndims(T) == 4 && size(T,4) == 3 && isa(T, 'double')
+    elseif false%ndims(T) == 4 && size(T,4) == 3 && isa(T, 'double')
         sgm = 1.3;
+%         sgm = 0.5;
         T = cat(4, imgaussfilt3(T(:,:,:, 1), sgm), imgaussfilt3(T(:,:,:, 2), sgm), imgaussfilt3(T(:,:,:, 3), sgm));
         iT = mex_inverse_3d_displacements_double(T, 1);
     elseif ndims(T) == 4

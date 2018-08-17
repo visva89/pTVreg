@@ -1,9 +1,9 @@
-function [err_N, sG] = ptv_nuclear_metric(volfix, voldef, pix_resolution, mask, singular_coefs)
+function [err_N, sG] = ptv_nuclear_metric(volfix, voldef, pix_resolution, mask, singular_coefs, norm_type)
     volsz = [size(voldef, 1), size(voldef, 2), size(voldef, 3)]; 
     npix = prod(volsz);
     Nimgs = size(voldef, 5);
     
-    nuc_G = zeros(size(voldef), 'like', voldef);
+%     nuc_G = zeros(size(voldef), 'like', voldef);
     err_N = 0;
     
 %     imagesc([voldef(:,:, round(end/2), 1, 1), volfix(:,:, round(end/2), 1, 1)]); pause(0.02);
@@ -31,8 +31,18 @@ function [err_N, sG] = ptv_nuclear_metric(volfix, voldef, pix_resolution, mask, 
     end
     singular_coefs = singular_coefs(1 : min(numel(singular_coefs), size(X, 1)));
     [sU, sS, sV] = svdecon(X);
+%     sS
     diagS = diag(sS);
-    sGt = sU * (diag(singular_coefs) * sV');
+    if false
+        sGt = sU * ( (diag(singular_coefs)) * sV');
+        err_N = sum(diagS(:) .* singular_coefs(:));
+    else
+        eps = 1e-4;
+%         eps=0.1;
+        G_sS = diagS ./ sqrt(diagS.^2 + eps);
+        sGt = sU * ( (diag(singular_coefs(:) .* G_sS(:))) * sV');
+        err_N = sum( sqrt(diagS.^2 + eps) .* singular_coefs(:));
+    end
     
 %     if true
 %         sk1 = sqrt(1 : size(singular_coefs, 1));
@@ -82,5 +92,6 @@ function [err_N, sG] = ptv_nuclear_metric(volfix, voldef, pix_resolution, mask, 
         end
         sG = sG(:,:,:, 2:end);
     end
-    err_N = sum(diagS(:) .* singular_coefs(:));
+    
+
 end

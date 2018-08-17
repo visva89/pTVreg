@@ -1,4 +1,4 @@
-function [t1, t2, alpha, scale, TransMat, Displ] = estimate_rigid_scale_from_displ(T, mask)
+function [t1, t2, alpha, scale, TransMat, Displ] = estimate_rigid_scale_from_displ(T, mask, varargin)
     % t1 - translation in first dimension
     % t2 - translation in second dimension
     % alpha - angle (in radians). Rotation is performed around (0,0) point.
@@ -19,10 +19,16 @@ function [t1, t2, alpha, scale, TransMat, Displ] = estimate_rigid_scale_from_dis
     end
     mask = logical(mask);
     
+    if nargin >= 3
+        rot_center = varargin{1};
+    else
+        rot_center = [0, 0];
+    end
+    
     sz = [size(T, 1), size(T, 2)];
     [n1, n2] = ndgrid(1:sz(1), 1:sz(2));
-    T(:,:,1) = T(:,:,1) + n1;
-    T(:,:,2) = T(:,:,2) + n2;
+    T(:,:,1) = T(:,:,1) + n1 - rot_center(1);
+    T(:,:,2) = T(:,:,2) + n2 - rot_center(2);
     ND = cat(3, n1, n2);
     
     T = reshape(T, [size(T,1)*size(T, 2), 2]);
